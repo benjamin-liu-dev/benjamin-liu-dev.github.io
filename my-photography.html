@@ -92,26 +92,39 @@
       margin-bottom: 36px;
     }
 
-    figure {
+    .gallery {
       border-top: 1px solid var(--line);
       padding-top: 28px;
       opacity: 0;
       animation: fadeUp 0.7s ease 0.3s forwards;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
     }
 
-    img.photo {
+    .gallery-item {
+      aspect-ratio: 4 / 3;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: var(--line);
+    }
+
+    .gallery-item a {
       display: block;
       width: 100%;
-      height: auto;
-      border-radius: 6px;
-      border: 1px solid rgba(217, 212, 200, 0.9);
+      height: 100%;
+      cursor: pointer;
+      position: relative;
+      z-index: 1;
     }
 
-    figcaption {
-      margin-top: 12px;
-      font-size: 0.78rem;
-      color: var(--muted);
-      letter-spacing: 0.02em;
+    .gallery-item img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
     }
 
     footer {
@@ -130,10 +143,15 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
+    @media (max-width: 768px) {
+      .gallery { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    }
+
     @media (max-width: 520px) {
       .page { padding: 48px 20px 80px; }
       header { flex-direction: column; gap: 16px; }
       footer { flex-direction: column; gap: 8px; }
+      .gallery { grid-template-columns: 1fr; gap: 12px; }
     }
   </style>
 </head>
@@ -149,15 +167,30 @@
 
     <main>
       <h1>My Photography</h1>
-      <p class="sub">One photo from 2025 on Mauna Kea.</p>
+      <p class="sub">A selection of my photography. Placeholder images for now.</p>
 
-      <figure>
-        <a data-flickr-embed="true" href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea">
-          <img class="photo" src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" width="1024" height="683" alt="2025 Mauna Kea" />
-        </a>
-        <figcaption>2025 — Mauna Kea (via Flickr)</figcaption>
-      </figure>
-      <script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+      <div class="gallery">
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+      </div>
     </main>
 
     <footer>

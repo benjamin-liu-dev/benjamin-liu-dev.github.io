@@ -90,14 +90,162 @@
       max-width: 64ch;
       opacity: 0;
       animation: fadeUp 0.7s ease 0.2s forwards;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
 
-    .map-section {
+    .heatmap-section {
+      border-top: 1px solid var(--line);
+      padding-top: 28px;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.25s forwards;
+    }
+
+    .heatmap-section .section-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .heatmap-wrap {
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: var(--line);
+    }
+
+    #heatmap {
+      width: 100%;
+      height: 380px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .heatmap-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 380px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .hikes-list {
       border-top: 1px solid var(--line);
       padding-top: 28px;
       opacity: 0;
       animation: fadeUp 0.7s ease 0.3s forwards;
+    }
+
+    .hike-card {
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 28px;
+      align-items: center;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hike-card:last-child { border-bottom: none; }
+
+    .hike-gallery {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: var(--line);
+      position: relative;
+    }
+
+    .gallery-viewport {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .gallery-slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .gallery-slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 1;
+    }
+
+    .gallery-slide img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .gallery-prev,
+    .gallery-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 1.25rem;
+      line-height: 1;
+      cursor: pointer;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+
+    .gallery-prev:hover,
+    .gallery-next:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(201, 79, 30, 0.06);
+    }
+
+    .gallery-prev { left: 8px; }
+    .gallery-next { right: 8px; }
+
+    .gallery-counter {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      color: var(--bg);
+      background: rgba(0, 0, 0, 0.5);
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+
+    .hike-info { min-width: 0; }
+
+    .hike-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+
+    .hike-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+      line-height: 1.5;
     }
 
     .map-wrap {
@@ -105,27 +253,26 @@
       overflow: hidden;
       border: 1px solid var(--line);
       background: var(--bg);
+      width: 100%;
+      aspect-ratio: 1;
+      max-width: 320px;
     }
 
-    #map {
+    .map-wrap .map {
       width: 100%;
-      height: 480px;
+      height: 100%;
       position: relative;
       z-index: 1;
     }
 
-    .map-caption {
-      margin-top: 12px;
-      font-size: 0.78rem;
-      color: var(--muted);
-      letter-spacing: 0.02em;
-    }
-
     .map-loading {
-      padding: 2rem;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 120px;
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 0.8rem;
     }
 
     footer {
@@ -149,11 +296,18 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
+    @media (max-width: 640px) {
+      .hike-card { grid-template-columns: 1fr; }
+      .hike-gallery { max-width: 100%; }
+      .map-wrap { max-width: 100%; }
+    }
+
     @media (max-width: 520px) {
       .page { padding: 48px 20px 80px; }
       header { flex-direction: column; gap: 16px; }
       footer { flex-direction: column; gap: 8px; }
-      #map { height: 360px; }
+      #heatmap { height: 280px; }
+      .heatmap-loading { height: 280px; }
     }
   </style>
 </head>
@@ -169,15 +323,208 @@
 
     <main>
       <h1>My Hikes</h1>
-      <p class="sub">Trail traces from my hikes. Rifle Arch Trail — Colorado.</p>
+      <p class="sub">Trail traces from my hikes. Placeholder content for now.</p>
 
-      <section class="map-section">
-        <div class="map-wrap">
-          <div id="map">
-            <div class="map-loading">Loading map and track…</div>
+      <section class="heatmap-section">
+        <p class="section-label">All hikes — heat map</p>
+        <div class="heatmap-wrap">
+          <div id="heatmap">
+            <div class="heatmap-loading">Loading heat map…</div>
           </div>
         </div>
-        <p class="map-caption">Rifle Arch Trail — GPX trace</p>
+      </section>
+
+      <section class="hikes-list">
+        <article class="hike-card">
+          <div class="hike-gallery">
+            <div class="gallery-viewport">
+              <div class="gallery-slide active"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 1" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 2" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 3" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 4" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 5" /></div>
+            </div>
+            <button type="button" class="gallery-prev" aria-label="Previous image">‹</button>
+            <button type="button" class="gallery-next" aria-label="Next image">›</button>
+            <span class="gallery-counter">1 / 5</span>
+          </div>
+          <div class="hike-info">
+            <h2 class="hike-title">Rifle Arch Trail</h2>
+            <p class="hike-desc">Colorado. Placeholder — same GPX trace for all entries.</p>
+            <div class="map-wrap"><div id="map-1" class="map"><div class="map-loading">Loading…</div></div></div>
+          </div>
+        </article>
+        <article class="hike-card">
+          <div class="hike-gallery">
+            <div class="gallery-viewport">
+              <div class="gallery-slide active"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 1" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 2" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 3" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 4" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 5" /></div>
+            </div>
+            <button type="button" class="gallery-prev" aria-label="Previous image">‹</button>
+            <button type="button" class="gallery-next" aria-label="Next image">›</button>
+            <span class="gallery-counter">1 / 5</span>
+          </div>
+          <div class="hike-info">
+            <h2 class="hike-title">Rifle Arch Trail</h2>
+            <p class="hike-desc">Colorado. Placeholder — same GPX trace for all entries.</p>
+            <div class="map-wrap"><div id="map-2" class="map"><div class="map-loading">Loading…</div></div></div>
+          </div>
+        </article>
+        <article class="hike-card">
+          <div class="hike-gallery">
+            <div class="gallery-viewport">
+              <div class="gallery-slide active"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 1" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 2" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 3" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 4" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 5" /></div>
+            </div>
+            <button type="button" class="gallery-prev" aria-label="Previous image">‹</button>
+            <button type="button" class="gallery-next" aria-label="Next image">›</button>
+            <span class="gallery-counter">1 / 5</span>
+          </div>
+          <div class="hike-info">
+            <h2 class="hike-title">Rifle Arch Trail</h2>
+            <p class="hike-desc">Colorado. Placeholder — same GPX trace for all entries.</p>
+            <div class="map-wrap"><div id="map-3" class="map"><div class="map-loading">Loading…</div></div></div>
+          </div>
+        </article>
+        <article class="hike-card">
+          <div class="hike-gallery">
+            <div class="gallery-viewport">
+              <div class="gallery-slide active"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 1" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 2" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 3" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 4" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 5" /></div>
+            </div>
+            <button type="button" class="gallery-prev" aria-label="Previous image">‹</button>
+            <button type="button" class="gallery-next" aria-label="Next image">›</button>
+            <span class="gallery-counter">1 / 5</span>
+          </div>
+          <div class="hike-info">
+            <h2 class="hike-title">Rifle Arch Trail</h2>
+            <p class="hike-desc">Colorado. Placeholder — same GPX trace for all entries.</p>
+            <div class="map-wrap"><div id="map-4" class="map"><div class="map-loading">Loading…</div></div></div>
+          </div>
+        </article>
+        <article class="hike-card">
+          <div class="hike-gallery">
+            <div class="gallery-viewport">
+              <div class="gallery-slide active"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 1" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 2" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 3" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 4" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 5" /></div>
+            </div>
+            <button type="button" class="gallery-prev" aria-label="Previous image">‹</button>
+            <button type="button" class="gallery-next" aria-label="Next image">›</button>
+            <span class="gallery-counter">1 / 5</span>
+          </div>
+          <div class="hike-info">
+            <h2 class="hike-title">Rifle Arch Trail</h2>
+            <p class="hike-desc">Colorado. Placeholder — same GPX trace for all entries.</p>
+            <div class="map-wrap"><div id="map-5" class="map"><div class="map-loading">Loading…</div></div></div>
+          </div>
+        </article>
+        <article class="hike-card">
+          <div class="hike-gallery">
+            <div class="gallery-viewport">
+              <div class="gallery-slide active"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 1" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 2" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 3" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 4" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 5" /></div>
+            </div>
+            <button type="button" class="gallery-prev" aria-label="Previous image">‹</button>
+            <button type="button" class="gallery-next" aria-label="Next image">›</button>
+            <span class="gallery-counter">1 / 5</span>
+          </div>
+          <div class="hike-info">
+            <h2 class="hike-title">Rifle Arch Trail</h2>
+            <p class="hike-desc">Colorado. Placeholder — same GPX trace for all entries.</p>
+            <div class="map-wrap"><div id="map-6" class="map"><div class="map-loading">Loading…</div></div></div>
+          </div>
+        </article>
+        <article class="hike-card">
+          <div class="hike-gallery">
+            <div class="gallery-viewport">
+              <div class="gallery-slide active"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 1" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 2" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 3" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 4" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 5" /></div>
+            </div>
+            <button type="button" class="gallery-prev" aria-label="Previous image">‹</button>
+            <button type="button" class="gallery-next" aria-label="Next image">›</button>
+            <span class="gallery-counter">1 / 5</span>
+          </div>
+          <div class="hike-info">
+            <h2 class="hike-title">Rifle Arch Trail</h2>
+            <p class="hike-desc">Colorado. Placeholder — same GPX trace for all entries.</p>
+            <div class="map-wrap"><div id="map-7" class="map"><div class="map-loading">Loading…</div></div></div>
+          </div>
+        </article>
+        <article class="hike-card">
+          <div class="hike-gallery">
+            <div class="gallery-viewport">
+              <div class="gallery-slide active"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 1" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 2" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 3" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 4" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 5" /></div>
+            </div>
+            <button type="button" class="gallery-prev" aria-label="Previous image">‹</button>
+            <button type="button" class="gallery-next" aria-label="Next image">›</button>
+            <span class="gallery-counter">1 / 5</span>
+          </div>
+          <div class="hike-info">
+            <h2 class="hike-title">Rifle Arch Trail</h2>
+            <p class="hike-desc">Colorado. Placeholder — same GPX trace for all entries.</p>
+            <div class="map-wrap"><div id="map-8" class="map"><div class="map-loading">Loading…</div></div></div>
+          </div>
+        </article>
+        <article class="hike-card">
+          <div class="hike-gallery">
+            <div class="gallery-viewport">
+              <div class="gallery-slide active"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 1" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 2" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 3" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 4" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 5" /></div>
+            </div>
+            <button type="button" class="gallery-prev" aria-label="Previous image">‹</button>
+            <button type="button" class="gallery-next" aria-label="Next image">›</button>
+            <span class="gallery-counter">1 / 5</span>
+          </div>
+          <div class="hike-info">
+            <h2 class="hike-title">Rifle Arch Trail</h2>
+            <p class="hike-desc">Colorado. Placeholder — same GPX trace for all entries.</p>
+            <div class="map-wrap"><div id="map-9" class="map"><div class="map-loading">Loading…</div></div></div>
+          </div>
+        </article>
+        <article class="hike-card">
+          <div class="hike-gallery">
+            <div class="gallery-viewport">
+              <div class="gallery-slide active"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 1" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 2" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 3" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 4" /></div>
+              <div class="gallery-slide"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="Hike 5" /></div>
+            </div>
+            <button type="button" class="gallery-prev" aria-label="Previous image">‹</button>
+            <button type="button" class="gallery-next" aria-label="Next image">›</button>
+            <span class="gallery-counter">1 / 5</span>
+          </div>
+          <div class="hike-info">
+            <h2 class="hike-title">Rifle Arch Trail</h2>
+            <p class="hike-desc">Colorado. Placeholder — same GPX trace for all entries.</p>
+            <div class="map-wrap"><div id="map-10" class="map"><div class="map-loading">Loading…</div></div></div>
+          </div>
+        </article>
       </section>
     </main>
 
@@ -188,10 +535,10 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
   <script>
     (function () {
-      var mapEl = document.getElementById('map');
-      var loadingEl = mapEl.querySelector('.map-loading');
+      document.getElementById('yr').textContent = new Date().getFullYear();
 
       fetch('./gpx%20files/Rifle_Arch_Trail.gpx')
         .then(function (r) { return r.text(); })
@@ -201,39 +548,88 @@
           var ns = 'http://www.topografix.com/GPX/1/1';
           var pts = doc.getElementsByTagNameNS(ns, 'trkpt');
           if (!pts.length) pts = doc.querySelectorAll('trkpt');
-          if (!pts.length) {
-            loadingEl.textContent = 'No track points found in GPX.';
-            return;
-          }
           var latlngs = [];
           for (var i = 0; i < pts.length; i++) {
             var lat = parseFloat(pts[i].getAttribute('lat'));
             var lon = parseFloat(pts[i].getAttribute('lon'));
             if (!isNaN(lat) && !isNaN(lon)) latlngs.push([lat, lon]);
           }
-          if (!latlngs.length) {
-            loadingEl.textContent = 'Could not parse track points.';
-            return;
+          if (!latlngs.length) return;
+
+          var heatPoints = [];
+          for (var i = 0; i < latlngs.length; i++) {
+            heatPoints.push([latlngs[i][0], latlngs[i][1], 0.4]);
+          }
+          var heatEl = document.getElementById('heatmap');
+          var heatLoading = heatEl && heatEl.querySelector('.heatmap-loading');
+          if (heatEl && typeof L.heatLayer === 'function') {
+            if (heatLoading) heatLoading.remove();
+            var heatMap = L.map('heatmap', { zoomControl: false }).setView(latlngs[0], 12);
+            heatMap.addControl(L.control.zoom({ position: 'topright' }));
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(heatMap);
+            L.heatLayer(heatPoints, {
+              radius: 28,
+              blur: 20,
+              maxZoom: 16,
+              gradient: { 0.2: '#c94f1e', 0.5: '#e86a3d', 0.8: '#f0a080', 1: 'rgba(255,255,255,0.4)' }
+            }).addTo(heatMap);
+            var bounds = L.latLngBounds(latlngs);
+            heatMap.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
+          } else if (heatLoading) {
+            heatLoading.textContent = 'Heat map unavailable.';
           }
 
-          loadingEl.remove();
-          var map = L.map('map').setView(latlngs[0], 14);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          }).addTo(map);
+          for (var n = 1; n <= 10; n++) {
+            var mapEl = document.getElementById('map-' + n);
+            if (!mapEl) continue;
+            var loadingEl = mapEl.querySelector('.map-loading');
+            if (loadingEl) loadingEl.remove();
 
-          var polyline = L.polyline(latlngs, {
-            color: '#c94f1e',
-            weight: 4,
-            opacity: 0.9
-          }).addTo(map);
-          map.fitBounds(polyline.getBounds(), { padding: [24, 24] });
+            var map = L.map('map-' + n, { zoomControl: false }).setView(latlngs[0], 14);
+            map.addControl(L.control.zoom({ position: 'bottomright' }));
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+            var polyline = L.polyline(latlngs, { color: '#c94f1e', weight: 3, opacity: 0.9 }).addTo(map);
+            map.fitBounds(polyline.getBounds(), { padding: [8, 8], maxZoom: 14 });
+          }
         })
-        .catch(function (err) {
-          loadingEl.textContent = 'Could not load GPX: ' + (err.message || 'error');
+        .catch(function () {
+          var heatLoading = document.querySelector('.heatmap-loading');
+          if (heatLoading) heatLoading.textContent = 'Could not load hike data.';
+          for (var n = 1; n <= 10; n++) {
+            var mapEl = document.getElementById('map-' + n);
+            if (mapEl) {
+              var loadingEl = mapEl.querySelector('.map-loading');
+              if (loadingEl) loadingEl.textContent = 'Could not load GPX.';
+            }
+          }
         });
+    })();
 
-      document.getElementById('yr').textContent = new Date().getFullYear();
+    (function () {
+      document.body.addEventListener('click', function (e) {
+        var gallery = e.target.closest('.hike-gallery');
+        if (!gallery) return;
+        var prev = e.target.closest('.gallery-prev');
+        var next = e.target.closest('.gallery-next');
+        if (!prev && !next) return;
+        var viewport = gallery.querySelector('.gallery-viewport');
+        var slides = viewport ? viewport.querySelectorAll('.gallery-slide') : [];
+        var counterEl = gallery.querySelector('.gallery-counter');
+        var idx = -1;
+        for (var i = 0; i < slides.length; i++) {
+          if (slides[i].classList.contains('active')) { idx = i; break; }
+        }
+        if (idx < 0) return;
+        slides[idx].classList.remove('active');
+        if (next) idx = (idx + 1) % slides.length;
+        else idx = (idx - 1 + slides.length) % slides.length;
+        slides[idx].classList.add('active');
+        if (counterEl) counterEl.textContent = (idx + 1) + ' / ' + slides.length;
+      });
     })();
   </script>
 </body>
