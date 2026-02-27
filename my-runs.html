@@ -118,6 +118,23 @@
       margin-bottom: 6px;
     }
 
+    .run-date {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .run-tag {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: var(--line);
+      padding: 3px 10px;
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+
     .run-meta {
       display: flex;
       flex-wrap: wrap;
@@ -136,16 +153,13 @@
       white-space: nowrap;
     }
 
-    .run-tag {
-      font-size: 0.68rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      background: var(--line);
-      padding: 3px 10px;
-      border-radius: 2px;
-      white-space: nowrap;
+    .run-link {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.1rem;
+      color: var(--ink);
+      text-decoration: none;
     }
+    .run-link:hover { color: var(--accent); }
 
     .run-empty {
       font-size: 0.85rem;
@@ -198,7 +212,7 @@
 
     <main>
       <h1>I run</h1>
-      <p class="sub">Runs I’ve tracked — distance, pace, time, and elevation gain pulled from my .fit files.</p>
+      <p class="sub">Run stats from .fit files — distance, pace, and time in imperial.</p>
 
       <section class="runs">
         <div id="runs-root" class="run-empty">Loading run stats…</div>
@@ -224,45 +238,33 @@
         });
       }
 
-      function fmtMaybe(v, suffix) {
-        if (v === null || v === undefined || v === '') return '';
-        return String(v) + (suffix || '');
-      }
-
       fetch('./runs/runs.json', { cache: 'no-store' })
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (data) {
           if (!data || !data.runs || !data.runs.length) {
-            root.textContent = 'No runs yet. Add a .fit file to /runs and rebuild.';
+            root.textContent = 'No .fit files in /runs/.';
             return;
           }
 
+          function fmt(v, suffix) {
+            if (v === null || v === undefined || v === '') return '';
+            return String(v) + (suffix || '');
+          }
           var html = '<ul class="run-list">';
           for (var i = 0; i < data.runs.length; i++) {
             var run = data.runs[i] || {};
-            var title = run.title || 'Run';
+            var title = run.title || run.id || 'Run';
             var date = run.startTime ? new Date(run.startTime).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '';
             var distanceMi = run.distanceMi != null ? (run.distanceMi.toFixed ? run.distanceMi.toFixed(2) : run.distanceMi) : '';
-            var distanceKm = run.distanceKm != null ? (run.distanceKm.toFixed ? run.distanceKm.toFixed(2) : run.distanceKm) : '';
-            var paceMi = run.paceMi || '';
-            var paceKm = run.pace || '';
+            var pace = run.pacePerMile || '';
             html += '<li class="run-item">';
             html +=   '<div>';
-            html +=     '<div class="run-title">' + esc(title) + (date ? (' <span style="font-size:0.72rem;color:var(--muted);font-weight:300">(' + esc(date) + ')</span>') : '') + '</div>';
+            html +=     '<div class="run-title">' + esc(title) + (date ? (' <span class="run-date">(' + esc(date) + ')</span>') : '') + '</div>';
             html +=     '<div class="run-meta">';
-            if (distanceMi) {
-              html += '<span><strong>Distance</strong> ' + esc(distanceMi) + ' mi</span>';
-            } else if (distanceKm) {
-              html += '<span><strong>Distance</strong> ' + esc(distanceKm) + ' km</span>';
-            }
-            if (paceMi) {
-              html += '<span><strong>Pace</strong> ' + esc(paceMi) + '</span>';
-            } else if (paceKm) {
-              html += '<span><strong>Pace</strong> ' + esc(paceKm) + '</span>';
-            }
+            if (distanceMi) html += '<span><strong>Distance</strong> ' + esc(distanceMi) + ' mi</span>';
+            if (pace) html += '<span><strong>Pace</strong> ' + esc(pace) + '</span>';
             if (run.movingTime) html += '<span><strong>Moving</strong> ' + esc(run.movingTime) + '</span>';
             if (run.elapsedTime) html += '<span><strong>Elapsed</strong> ' + esc(run.elapsedTime) + '</span>';
-            if (run.elevationGainM != null) html += '<span><strong>Gain</strong> ' + esc(fmtMaybe(run.elevationGainM, ' m')) + '</span>';
             html +=     '</div>';
             html +=   '</div>';
             html +=   '<span class="run-tag">' + esc(run.sport || 'run') + '</span>';
