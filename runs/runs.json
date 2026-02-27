@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-02-27T00:18:34.839420Z",
+  "count": 1,
+  "runs": [
+    {
+      "id": "Snow_Day_Run.fit",
+      "title": "Snow Day Run",
+      "sport": "running",
+      "startTime": "2026-02-24T22:21:01Z",
+      "distanceKm": 7.81,
+      "pace": "6:44 /km",
+      "distanceMi": 4.85,
+      "paceMi": "10:51 /mi",
+      "movingTime": "52:39",
+      "elapsedTime": "1:11:05",
+      "elevationGainM": null,
+      "file": "runs/Snow_Day_Run.fit"
+    }
+  ]
+}
