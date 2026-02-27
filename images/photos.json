@@ -1,0 +1,28 @@
+{
+  "photos": [
+    {
+      "title": "2025 Mauna Kea",
+      "url": "https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/",
+      "src": "https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg",
+      "width": 1024,
+      "height": 683,
+      "alt": "2025 Mauna Kea"
+    },
+    {
+      "title": "2024 Lake Crescent",
+      "url": "https://www.flickr.com/photos/204351264@N08/55118187415/in/dateposted-public/",
+      "src": "https://live.staticflickr.com/65535/55118187415_23977d2fe0_b.jpg",
+      "width": 1024,
+      "height": 683,
+      "alt": "DSC00961"
+    },
+    {
+      "title": "2024 Rialto Beach",
+      "url": "https://www.flickr.com/photos/204351264@N08/55117792191/in/dateposted-public/",
+      "src": "https://live.staticflickr.com/65535/55117792191_259e7b5c03_b.jpg",
+      "width": 683,
+      "height": 1024,
+      "alt": "DSC09702"
+    }
+  ]
+}

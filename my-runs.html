@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>I run • Ben Liu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <style>
+    :root {
+      --bg: #f5f2eb;
+      --ink: #1a1814;
+      --muted: #7a7060;
+      --accent: #c94f1e;
+      --line: #d9d4c8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .page {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 80px 32px 120px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 20px;
+      margin-bottom: 56px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards;
+    }
+
+    .logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1rem;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    nav { display: flex; gap: 28px; }
+
+    nav a {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--accent); }
+
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.1s forwards;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.8;
+      max-width: 64ch;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.2s forwards;
+      margin-bottom: 32px;
+    }
+
+    .chart-section {
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.22s forwards;
+    }
+
+    .chart-section .section-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .chart-wrap {
+      background: rgba(217, 212, 200, 0.2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      height: 260px;
+    }
+
+    .chart-wrap canvas { max-width: 100%; }
+
+    .heatmap-section {
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.24s forwards;
+    }
+
+    .heatmap-section .section-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .map-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px 24px;
+      align-items: center;
+      margin-bottom: 14px;
+      font-size: 0.78rem;
+      color: var(--ink);
+    }
+
+    .map-filters label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-weight: 300;
+    }
+
+    .map-filters input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .filter-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .filter-dot.hikes-dot { background: #c94f1e; }
+    .filter-dot.runs-dot { background: #1e5fc9; }
+    .filter-dot.snow-dot { background: #0d9488; }
+
+    .heatmap-wrap {
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: var(--line);
+    }
+
+    #combined-map {
+      width: 100%;
+      height: 380px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .heatmap-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 380px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .runs {
+      border-top: 1px solid var(--line);
+      padding-top: 28px;
+      margin-top: 12px;
+      margin-bottom: 80px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.25s forwards;
+    }
+
+    .run-list { list-style: none; }
+
+    .run-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .run-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+    }
+
+    .run-date {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .run-tag {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: var(--line);
+      padding: 3px 10px;
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+
+    .run-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    .run-meta span {
+      background: rgba(217, 212, 200, 0.55);
+      border: 1px solid rgba(217, 212, 200, 0.9);
+      padding: 4px 8px;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+
+    .run-link {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.1rem;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .run-link:hover { color: var(--accent); }
+
+    .run-empty {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.8;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-top: 72px;
+    }
+
+    footer a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 640px) {
+      .run-item { grid-template-columns: 1fr; align-items: flex-start; }
+    }
+
+    @media (max-width: 520px) {
+      .page { padding: 48px 20px 80px; }
+      header { flex-direction: column; gap: 16px; }
+      footer { flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <a class="logo" href="./index.html">Ben Liu</a>
+      <nav>
+        <a href="./index.html#work">Work</a>
+        <a href="./index.html#connect">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Steps</h1>
+      <p class="sub">Fresh air outside the office.</p>
+
+      <div id="combined-map-container"></div>
+
+      <section class="chart-section">
+        <p class="section-label">Total distance & avg pace by week</p>
+        <div class="chart-wrap">
+          <canvas id="runs-chart"></canvas>
+        </div>
+      </section>
+
+      <section class="runs">
+        <div id="runs-root" class="run-empty">Loading run stats…</div>
+      </section>
+    </main>
+
+    <footer>
+      <span>© <span id="yr"></span> Ben Liu</span>
+      <span>1 Cor 16:14</span>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="./combined-map.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
+    (function () {
+      var root = document.getElementById('runs-root');
+      if (!root) return;
+
+      function esc(s) {
+        return String(s || '').replace(/[&<>"']/g, function (c) {
+          return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+        });
+      }
+
+      fetch('./runs/runs.json', { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          if (!data || !data.runs || !data.runs.length) {
+            root.textContent = 'No .fit files in /runs/.';
+            return;
+          }
+
+          var runs = data.runs;
+
+          function weekKey(isoDateStr) {
+            if (!isoDateStr) return null;
+            var d = new Date(isoDateStr);
+            if (isNaN(d.getTime())) return null;
+            var day = d.getDay();
+            var diff = day === 0 ? -6 : 1 - day;
+            d.setDate(d.getDate() + diff);
+            return d.toISOString().slice(0, 10);
+          }
+
+          function paceToMinutes(paceStr) {
+            if (!paceStr || typeof paceStr !== 'string') return null;
+            var parts = paceStr.split(/\s/)[0].split(':');
+            var m = parseInt(parts[0], 10);
+            var s = parseInt(parts[1], 10) || 0;
+            if (isNaN(m)) return null;
+            return m + s / 60;
+          }
+
+          function minutesToPace(min) {
+            if (min == null || isNaN(min)) return '';
+            var M = Math.floor(min);
+            var s = Math.round((min - M) * 60);
+            if (s >= 60) { M += 1; s = 0; }
+            return M + ':' + (s < 10 ? '0' : '') + s;
+          }
+
+          var byWeek = {};
+          for (var i = 0; i < runs.length; i++) {
+            var run = runs[i];
+            var key = weekKey(run.startTime);
+            if (!key) continue;
+            if (!byWeek[key]) byWeek[key] = { distance: 0, paceSum: 0, paceCount: 0 };
+            if (run.distanceMi != null && !isNaN(run.distanceMi)) byWeek[key].distance += run.distanceMi;
+            var paceMin = paceToMinutes(run.pacePerMile);
+            if (paceMin != null) {
+              byWeek[key].paceSum += paceMin;
+              byWeek[key].paceCount += 1;
+            }
+          }
+
+          var weeks = Object.keys(byWeek).sort();
+          var totalDistance = weeks.map(function (w) { return byWeek[w].distance; });
+          var avgPaceMin = weeks.map(function (w) {
+            var o = byWeek[w];
+            return o.paceCount ? o.paceSum / o.paceCount : null;
+          });
+          var weekLabels = weeks.map(function (w) {
+            var d = new Date(w);
+            return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' });
+          });
+
+          var chartSection = document.querySelector('.chart-section');
+          if (chartSection && !weeks.length) chartSection.style.display = 'none';
+
+          if (typeof Chart !== 'undefined' && weeks.length) {
+            var ctx = document.getElementById('runs-chart');
+            if (ctx) {
+              new Chart(ctx, {
+                type: 'line',
+                data: {
+                  labels: weekLabels,
+                  datasets: [
+                    {
+                      label: 'Total distance (mi)',
+                      data: totalDistance,
+                      borderColor: '#c94f1e',
+                      backgroundColor: 'rgba(201, 79, 30, 0.1)',
+                      fill: true,
+                      tension: 0.2,
+                      yAxisID: 'y'
+                    },
+                    {
+                      label: 'Avg pace (min/mi)',
+                      data: avgPaceMin,
+                      borderColor: '#1e5fc9',
+                      backgroundColor: 'rgba(30, 95, 201, 0.1)',
+                      fill: true,
+                      tension: 0.2,
+                      yAxisID: 'y1'
+                    }
+                  ]
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  interaction: { mode: 'index', intersect: false },
+                  plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                      callbacks: {
+                        label: function (item) {
+                          if (item.datasetIndex === 0) return item.formattedValue + ' mi';
+                          if (item.datasetIndex === 1 && item.raw != null) return minutesToPace(item.raw) + ' /mi';
+                          return item.formattedValue;
+                        }
+                      }
+                    }
+                  },
+                  scales: {
+                    x: { grid: { display: false }, ticks: { maxRotation: 45 } },
+                    y: {
+                      type: 'linear',
+                      position: 'left',
+                      title: { display: true, text: 'Distance (mi)' },
+                      min: 0,
+                      grid: { color: 'rgba(0,0,0,0.06)' },
+                      ticks: { callback: function (v) { return v; } }
+                    },
+                    y1: {
+                      type: 'linear',
+                      position: 'right',
+                      title: { display: true, text: 'Avg pace (min/mi)' },
+                      grid: { drawOnChartArea: false },
+                      ticks: {
+                        callback: function (v) { return minutesToPace(v); }
+                      }
+                    }
+                  }
+                }
+              });
+            }
+          }
+
+          function fmt(v, suffix) {
+            if (v === null || v === undefined || v === '') return '';
+            return String(v) + (suffix || '');
+          }
+          var html = '<ul class="run-list">';
+          for (var i = 0; i < data.runs.length; i++) {
+            var run = data.runs[i] || {};
+            var title = run.title || run.id || 'Run';
+            var date = run.startTime ? new Date(run.startTime).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+            var location = run.startLocation || [run.startCity, run.startState].filter(Boolean).join(', ');
+            var distanceMi = run.distanceMi != null ? (run.distanceMi.toFixed ? run.distanceMi.toFixed(2) : run.distanceMi) : '';
+            var pace = run.pacePerMile || '';
+            html += '<li class="run-item">';
+            html +=   '<div>';
+            html +=     '<div class="run-title">' + esc(title) + (date ? (' <span class="run-date">' + esc(date) + (location ? ' · ' + esc(location) : '') + '</span>') : '') + '</div>';
+            html +=     '<div class="run-meta">';
+            if (distanceMi) html += '<span><strong>Distance</strong> ' + esc(distanceMi) + ' mi</span>';
+            if (pace) html += '<span><strong>Pace</strong> ' + esc(pace) + '</span>';
+            if (run.movingTime) html += '<span><strong>Moving</strong> ' + esc(run.movingTime) + '</span>';
+            if (run.elapsedTime) html += '<span><strong>Elapsed</strong> ' + esc(run.elapsedTime) + '</span>';
+            if (run.avgHeartRateBpm != null) html += '<span><strong>Avg HR</strong> ' + esc(run.avgHeartRateBpm) + ' bpm</span>';
+            if (run.avgTemperatureF != null) html += '<span><strong>Temp</strong> ' + esc(run.avgTemperatureF) + ' °F</span>';
+            html +=     '</div>';
+            html +=   '</div>';
+            html +=   '<span class="run-tag">' + esc(run.sport || 'run') + '</span>';
+            html += '</li>';
+          }
+          html += '</ul>';
+          root.classList.remove('run-empty');
+          root.innerHTML = html;
+        })
+        .catch(function () {
+          root.textContent = 'Could not load run stats.';
+        });
+    })();
+  </script>
+</body>
+</html>
