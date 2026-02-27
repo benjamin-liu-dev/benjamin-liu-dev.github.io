@@ -16,7 +16,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 16px; }
+    html { font-size: 16px; scroll-behavior: smooth; }
 
     body {
       background: var(--bg);
@@ -36,9 +36,9 @@
     }
 
     .page {
-      max-width: 920px;
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 80px 32px 120px;
+      padding: 80px 40px 120px;
     }
 
     header {
@@ -94,20 +94,60 @@
 
     .gallery {
       border-top: 1px solid var(--line);
-      padding-top: 28px;
+      padding-top: 36px;
       opacity: 0;
       animation: fadeUp 0.7s ease 0.3s forwards;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
     }
 
     .gallery-item {
-      aspect-ratio: 4 / 3;
-      border-radius: 6px;
+      position: relative;
+      border-radius: 12px;
       overflow: hidden;
-      border: 1px solid var(--line);
       background: var(--line);
+      box-shadow: 0 4px 20px rgba(26, 24, 20, 0.08);
+      transition: box-shadow 0.35s ease, transform 0.35s ease;
+    }
+
+    .gallery-item:hover {
+      box-shadow: 0 12px 40px rgba(26, 24, 20, 0.12);
+      transform: translateY(-4px);
+    }
+
+    .gallery-item:first-child {
+      grid-column: 1 / -1;
+      max-height: 75vh;
+    }
+
+    .gallery-item:first-child .gallery-item-inner {
+      aspect-ratio: 21 / 9;
+    }
+
+    .gallery-item:not(:first-child) .gallery-item-inner {
+      aspect-ratio: 4 / 3;
+    }
+
+    .gallery-item-inner {
+      display: block;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gallery-item-inner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.2) 0%, transparent 40%);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+    }
+
+    .gallery-item:hover .gallery-item-inner::after {
+      opacity: 1;
     }
 
     .gallery-item a {
@@ -117,6 +157,8 @@
       cursor: pointer;
       position: relative;
       z-index: 1;
+      color: inherit;
+      text-decoration: none;
     }
 
     .gallery-item img {
@@ -125,6 +167,40 @@
       height: 100%;
       object-fit: cover;
       pointer-events: none;
+      transition: transform 0.5s ease;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.03);
+    }
+
+    .gallery-item-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px 24px;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .gallery-item:hover .gallery-item-caption {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .gallery-loading {
+      grid-column: 1 / -1;
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding: 48px 0;
     }
 
     footer {
@@ -144,21 +220,23 @@
     }
 
     @media (max-width: 768px) {
-      .gallery { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .gallery { gap: 20px; }
+      .gallery-item:first-child .gallery-item-inner { aspect-ratio: 16 / 10; }
     }
 
     @media (max-width: 520px) {
       .page { padding: 48px 20px 80px; }
       header { flex-direction: column; gap: 16px; }
       footer { flex-direction: column; gap: 8px; }
-      .gallery { grid-template-columns: 1fr; gap: 12px; }
+      .gallery { grid-template-columns: 1fr; gap: 20px; padding-top: 24px; }
+      .gallery-item:first-child .gallery-item-inner { aspect-ratio: 4 / 3; }
     }
   </style>
 </head>
 <body>
   <div class="page">
     <header>
-      <a class="logo" href="./index.html">Your Name</a>
+      <a class="logo" href="./index.html">Ben Liu</a>
       <nav>
         <a href="./index.html#work">Work</a>
         <a href="./index.html#connect">Contact</a>
@@ -169,38 +247,51 @@
       <h1>My Photography</h1>
       <p class="sub">A selection of my photography. Placeholder images for now.</p>
 
-      <div class="gallery">
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
-        <div class="gallery-item"><a href="https://www.flickr.com/photos/204351264@N08/55117776306/in/dateposted-public/" title="2025 Mauna Kea" target="_blank" rel="noopener"><img src="https://live.staticflickr.com/65535/55117776306_2b036b8b32_b.jpg" alt="2025 Mauna Kea" /></a></div>
+      <div class="gallery" id="gallery-root">
+        <div class="gallery-loading" id="gallery-loading">Loading…</div>
       </div>
     </main>
 
     <footer>
-      <span>© <span id="yr"></span> Your Name</span>
-      <span><a href="./index.html" style="color: inherit; text-decoration: none;">Back to home</a></span>
+      <span>© <span id="yr"></span> Ben Liu</span>
+      <span>Made with AI.</span>
     </footer>
   </div>
 
   <script>
     document.getElementById('yr').textContent = new Date().getFullYear();
+
+    (function () {
+      function esc(s) {
+        return String(s || '').replace(/[&<>"']/g, function (c) {
+          return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+        });
+      }
+      var root = document.getElementById('gallery-root');
+      var loading = document.getElementById('gallery-loading');
+      fetch('./images/photos.json', { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          if (!data || !data.photos || !data.photos.length) {
+            if (loading) loading.textContent = 'No photos. Add entries to images/photos.json';
+            return;
+          }
+          if (loading) loading.remove();
+          var html = '';
+          for (var i = 0; i < data.photos.length; i++) {
+            var p = data.photos[i];
+            html += '<div class="gallery-item">';
+            html += '<a href="' + esc(p.url) + '" title="' + esc(p.title) + '" target="_blank" rel="noopener">';
+            html += '<span class="gallery-item-inner"><img src="' + esc(p.src) + '" alt="' + esc(p.alt) + '" /></span>';
+            html += '<span class="gallery-item-caption">' + esc(p.title) + '</span>';
+            html += '</a></div>';
+          }
+          root.insertAdjacentHTML('beforeend', html);
+        })
+        .catch(function () {
+          if (loading) loading.textContent = 'Could not load photos.';
+        });
+    })();
   </script>
 </body>
 </html>
