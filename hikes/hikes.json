@@ -1,0 +1,12 @@
+{
+  "hikes": [
+    {
+      "id": "Rifle_Arch_Trail.gpx",
+      "title": "Rifle Arch Trail",
+      "gpxPath": "hikes/Rifle_Arch_Trail.gpx",
+      "startLat": 39.613378,
+      "startLon": -107.809421,
+      "location": null
+    }
+  ]
+}

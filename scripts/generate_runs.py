@@ -7,22 +7,21 @@ import os
 import time
 from datetime import datetime, timezone
 
+import sys
+_scripts_dir = os.path.dirname(os.path.abspath(__file__))
+if _scripts_dir not in sys.path:
+    sys.path.insert(0, _scripts_dir)
+
 try:
     from fitparse import FitFile
 except ImportError:
-    import sys
-    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    repo_root = os.path.dirname(_scripts_dir)
     vendor = os.path.join(repo_root, ".vendor")
     if os.path.isdir(vendor) and vendor not in sys.path:
         sys.path.insert(0, vendor)
     from fitparse import FitFile
 
-try:
-    from geopy.geocoders import Nominatim
-    from geopy.extra.rate_limiter import RateLimiter
-except ImportError:
-    Nominatim = None
-    RateLimiter = None
+from utils import detailed_location, reverse_geocode
 
 METERS_PER_MILE = 1609.344
 SEMICIRCLES_TO_DEG = 180.0 / (2**31)
@@ -119,25 +118,27 @@ def _read_fit_session_and_start(fit_path: str) -> tuple:
                 break
     # Fallback: avg heart rate and temperature from records/laps when session has none
     avg_hr, avg_temp_c = _avg_from_records_and_laps(fit)
-    return session_fields, start_lat, start_lon, avg_hr, avg_temp_c
+    # Full track for map: list of [lat, lon] from all records
+    track = []
+    for record in fit.get_messages("record"):
+        lat = record.get_value("position_lat")
+        lon = record.get_value("position_long")
+        if lat is not None and lon is not None:
+            la, lo = _semicircles_to_deg(lat), _semicircles_to_deg(lon)
+            if la is not None and lo is not None:
+                track.append([round(la, 5), round(lo, 5)])
+    return session_fields, start_lat, start_lon, avg_hr, avg_temp_c, track
 
 
-def _reverse_geocode(lat: float, lon: float) -> tuple:
-    """Return (city, state) or (None, None). Uses Nominatim (1 req/s)."""
-    if Nominatim is None or lat is None or lon is None:
-        return None, None
-    try:
-        geolocator = Nominatim(user_agent="benjamin-liu-runs")
-        rev = RateLimiter(geolocator.reverse, min_delay_seconds=1.1) if RateLimiter else geolocator.reverse
-        location = rev(f"{lat}, {lon}", timeout=10)
-        if location is None or not hasattr(location, "raw"):
-            return None, None
-        addr = location.raw.get("address") or {}
-        city = addr.get("city") or addr.get("town") or addr.get("village") or addr.get("municipality") or addr.get("county")
-        state = addr.get("state")
-        return city, state
-    except Exception:
-        return None, None
+def _get_location_from_geocode(lat: float, lon: float) -> tuple:
+    """Return (detailed_location_str, city, state) using shared utils. Caller should rate-limit."""
+    addr = reverse_geocode(lat, lon, user_agent="benjamin-liu-runs")
+    if not addr:
+        return None, None, None
+    city = addr.get("city") or addr.get("town") or addr.get("village") or addr.get("municipality") or addr.get("county")
+    state = addr.get("state")
+    detailed = detailed_location(addr) or None
+    return detailed, city, state
 
 
 
@@ -152,7 +153,7 @@ def generate(repo_root: str):
             if not name.lower().endswith(".fit"):
                 continue
             fit_path = os.path.join(runs_dir, name)
-            fields, start_lat, start_lon, avg_hr_computed, avg_temp_computed = _read_fit_session_and_start(fit_path)
+            fields, start_lat, start_lon, avg_hr_computed, avg_temp_computed, track = _read_fit_session_and_start(fit_path)
 
             distance_m = fields.get("total_distance")
             avg_speed = fields.get("avg_speed")
@@ -174,17 +175,18 @@ def generate(repo_root: str):
             avg_heart_rate = int(avg_hr) if isinstance(avg_hr, (int, float)) else None
             avg_temperature_f = round(avg_temp_c * 9 / 5 + 32, 1) if isinstance(avg_temp_c, (int, float)) else None
 
-            start_city, start_state = None, None
+            start_location, start_city, start_state = None, None, None
             if start_lat is not None and start_lon is not None:
                 if items:  # Nominatim rate limit: 1 req/s
                     time.sleep(1.1)
-                start_city, start_state = _reverse_geocode(start_lat, start_lon)
+                start_location, start_city, start_state = _get_location_from_geocode(start_lat, start_lon)
 
             items.append({
                 "id": name,
                 "title": title,
                 "sport": str(sport) if sport is not None else "running",
                 "startTime": _iso(start_time) if isinstance(start_time, datetime) else "",
+                "startLocation": start_location,
                 "startCity": start_city,
                 "startState": start_state,
                 "distanceMi": distance_mi,
@@ -194,6 +196,7 @@ def generate(repo_root: str):
                 "avgHeartRateBpm": avg_heart_rate,
                 "avgTemperatureF": avg_temperature_f,
                 "file": f"runs/{name}",
+                "track": track if track else None,
             })
 
     payload = {
