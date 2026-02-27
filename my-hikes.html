@@ -283,7 +283,8 @@
       color: var(--ink);
     }
 
-    .hike-location {
+    .hike-location,
+    .hike-date {
       font-size: 0.72rem;
       font-weight: 300;
       color: var(--muted);
@@ -371,7 +372,7 @@
 
     <main>
       <h1>Mountains</h1>
-      <p class="sub">Trail traces from my hikes. Placeholder content for now.</p>
+      <p class="sub">Trail traces and views from my hikes.</p>
 
       <div id="combined-map-container"></div>
 
@@ -382,7 +383,7 @@
 
     <footer>
       <span>© <span id="yr"></span> Ben Liu</span>
-      <span>Made with AI.</span>
+      <span>1 Cor 16:14</span>
     </footer>
   </div>
 
@@ -428,7 +429,8 @@
           var html = '';
           for (var i = 0; i < hikes.length; i++) {
             var h = hikes[i];
-            var loc = h.location ? (' <span class="hike-location">' + esc(h.location) + '</span>') : '';
+            var dateStr = h.startTime ? new Date(h.startTime).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+            var titleExtra = dateStr ? (' <span class="hike-date">' + esc(dateStr) + (h.location ? ' · ' + esc(h.location) : '') + '</span>') : (h.location ? (' <span class="hike-location">' + esc(h.location) + '</span>') : '');
             html += '<article class="hike-card">';
             html += '  <div class="hike-gallery">';
             html += '    <div class="gallery-viewport">';
@@ -439,7 +441,7 @@
             html += '    <span class="gallery-counter">1 / 1</span>';
             html += '  </div>';
             html += '  <div class="hike-info">';
-            html += '    <h2 class="hike-title">' + esc(h.title) + loc + '</h2>';
+            html += '    <h2 class="hike-title">' + esc(h.title) + titleExtra + '</h2>';
             html += '    <div class="map-wrap"><div id="map-' + i + '" class="map"><div class="map-loading">Loading…</div></div></div>';
             html += '  </div>';
             html += '</article>';

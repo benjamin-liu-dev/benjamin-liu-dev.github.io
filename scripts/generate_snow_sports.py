@@ -18,7 +18,7 @@ FOLDER = "snow-sports"
 
 
 def _first_trkpt_and_name(gpx_path: str) -> tuple:
-    """Return (track_name, lat, lon) from first trkpt; track_name from first trk/name or filename."""
+    """Return (track_name, lat, lon, start_time_iso) from first trkpt; track_name from first trk/name or filename."""
     tree = ET.parse(gpx_path)
     root = tree.getroot()
     name = None
@@ -29,16 +29,18 @@ def _first_trkpt_and_name(gpx_path: str) -> tuple:
             break
     if not name:
         name = os.path.splitext(os.path.basename(gpx_path))[0].replace("_", " ")
-    lat, lon = None, None
+    lat, lon, start_time = None, None, None
     for pt in root.findall(f".//{{{GPX_NS}}}trkpt") or root.findall(".//trkpt"):
         try:
             lat = float(pt.get("lat"))
             lon = float(pt.get("lon"))
             if lat is not None and lon is not None:
-                return name, lat, lon
+                t = pt.find(f"{{{GPX_NS}}}time") or pt.find("time")
+                start_time = t.text.strip() if t is not None and t.text else None
+                return name, lat, lon, start_time
         except (TypeError, ValueError):
             continue
-    return name, None, None
+    return name, None, None, None
 
 
 def _get_location_from_geocode(lat: float, lon: float) -> tuple:
@@ -68,7 +70,7 @@ def generate(repo_root: str):
         path = os.path.join(gpx_dir, name)
         if not os.path.isfile(path):
             continue
-        title, lat, lon = _first_trkpt_and_name(path)
+        title, lat, lon, start_time = _first_trkpt_and_name(path)
         location, city, state = None, None, None
         if lat is not None and lon is not None:
             if items:
@@ -81,10 +83,13 @@ def generate(repo_root: str):
             "gpxPath": gpx_path,
             "startLat": lat,
             "startLon": lon,
+            "startTime": start_time,
             "location": location,
             "city": city,
             "state": state,
         })
+
+    items.sort(key=lambda x: x.get("startTime") or "", reverse=True)
 
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:

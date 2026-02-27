@@ -1,12 +1,31 @@
 {
   "hikes": [
     {
+      "id": "Morning_Hike_Cascade_Pass_Sahale_Arm.gpx",
+      "title": "Morning Hike Cascade Pass Sahale Arm",
+      "gpxPath": "hikes/Morning_Hike_Cascade_Pass_Sahale_Arm.gpx",
+      "startLat": 48.492702,
+      "startLon": -121.122074,
+      "startTime": null,
+      "location": "Skagit County, Washington"
+    },
+    {
+      "id": "Morning_hike_at_Indian_Head_and_Rainbow_Falls.gpx",
+      "title": "Morning hike at Indian Head and Rainbow Falls",
+      "gpxPath": "hikes/Morning_hike_at_Indian_Head_and_Rainbow_Falls.gpx",
+      "startLat": 44.14972,
+      "startLon": -73.76889,
+      "startTime": null,
+      "location": "Town of Keene, New York"
+    },
+    {
       "id": "Rifle_Arch_Trail.gpx",
       "title": "Rifle Arch Trail",
       "gpxPath": "hikes/Rifle_Arch_Trail.gpx",
       "startLat": 39.613378,
       "startLon": -107.809421,
-      "location": null
+      "startTime": null,
+      "location": "Garfield County, Colorado"
     }
   ]
 }

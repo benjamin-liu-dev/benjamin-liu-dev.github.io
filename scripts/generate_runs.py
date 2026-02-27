@@ -199,6 +199,8 @@ def generate(repo_root: str):
                 "track": track if track else None,
             })
 
+    items.sort(key=lambda x: x.get("startTime") or "", reverse=True)
+
     payload = {
         "generatedAt": _iso(datetime.now(timezone.utc)),
         "count": len(items),
