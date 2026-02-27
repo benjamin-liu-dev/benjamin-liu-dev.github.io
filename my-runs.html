@@ -211,8 +211,8 @@
     </header>
 
     <main>
-      <h1>I run</h1>
-      <p class="sub">Run stats from .fit files — distance, pace, and time in imperial.</p>
+      <h1>My Runs</h1>
+      <p class="sub">Run stats from weekly runs</p>
 
       <section class="runs">
         <div id="runs-root" class="run-empty">Loading run stats…</div>
@@ -255,16 +255,19 @@
             var run = data.runs[i] || {};
             var title = run.title || run.id || 'Run';
             var date = run.startTime ? new Date(run.startTime).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+            var location = [run.startCity, run.startState].filter(Boolean).join(', ');
             var distanceMi = run.distanceMi != null ? (run.distanceMi.toFixed ? run.distanceMi.toFixed(2) : run.distanceMi) : '';
             var pace = run.pacePerMile || '';
             html += '<li class="run-item">';
             html +=   '<div>';
-            html +=     '<div class="run-title">' + esc(title) + (date ? (' <span class="run-date">(' + esc(date) + ')</span>') : '') + '</div>';
+            html +=     '<div class="run-title">' + esc(title) + (date ? (' <span class="run-date">(' + esc(date) + (location ? ' · ' + esc(location) : '') + ')</span>') : '') + '</div>';
             html +=     '<div class="run-meta">';
             if (distanceMi) html += '<span><strong>Distance</strong> ' + esc(distanceMi) + ' mi</span>';
             if (pace) html += '<span><strong>Pace</strong> ' + esc(pace) + '</span>';
             if (run.movingTime) html += '<span><strong>Moving</strong> ' + esc(run.movingTime) + '</span>';
             if (run.elapsedTime) html += '<span><strong>Elapsed</strong> ' + esc(run.elapsedTime) + '</span>';
+            if (run.avgHeartRateBpm != null) html += '<span><strong>Avg HR</strong> ' + esc(run.avgHeartRateBpm) + ' bpm</span>';
+            if (run.avgTemperatureF != null) html += '<span><strong>Temp</strong> ' + esc(run.avgTemperatureF) + ' °F</span>';
             html +=     '</div>';
             html +=   '</div>';
             html +=   '<span class="run-tag">' + esc(run.sport || 'run') + '</span>';

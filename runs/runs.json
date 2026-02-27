@@ -1,18 +1,36 @@
 {
-  "generatedAt": "2026-02-27T00:51:06.422232Z",
-  "count": 1,
+  "generatedAt": "2026-02-27T03:54:54.640250Z",
+  "count": 2,
   "runs": [
     {
-      "id": "Snow_Day_Run.fit",
-      "title": "Snow Day Run",
+      "id": "Afternoon_Run_Hudson_River_Greenway.fit",
+      "title": "Afternoon Run Hudson River Greenway",
       "sport": "running",
-      "startTime": "2026-02-24T22:21:01Z",
-      "distanceMi": 4.85,
-      "pacePerMile": "10:51 /mi",
-      "movingTime": "52:39",
-      "elapsedTime": "1:11:05",
-      "elevationGainFt": null,
-      "file": "runs/Snow_Day_Run.fit"
+      "startTime": "2026-02-21T21:05:06Z",
+      "startCity": "New York",
+      "startState": "New York",
+      "distanceMi": 5.1,
+      "pacePerMile": "9:09 /mi",
+      "movingTime": "46:39",
+      "elapsedTime": "52:23",
+      "avgHeartRateBpm": 162,
+      "avgTemperatureF": null,
+      "file": "runs/Afternoon_Run_Hudson_River_Greenway.fit"
+    },
+    {
+      "id": "Morning_Run_Rifle_Colorado.fit",
+      "title": "Morning Run Rifle Colorado",
+      "sport": "running",
+      "startTime": "2025-12-31T15:42:48Z",
+      "startCity": "Rifle",
+      "startState": "Colorado",
+      "distanceMi": 2.53,
+      "pacePerMile": "12:14 /mi",
+      "movingTime": "30:57",
+      "elapsedTime": "31:35",
+      "avgHeartRateBpm": 164,
+      "avgTemperatureF": null,
+      "file": "runs/Morning_Run_Rifle_Colorado.fit"
     }
   ]
 }
